@@ -67,7 +67,14 @@ public class SchemaInitListener implements ServletContextListener {
             "ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT FALSE",
             "ALTER TABLE users ADD COLUMN verify_code CHAR(6)",
             "ALTER TABLE users ADD COLUMN verify_expires TIMESTAMP NULL",
-            "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'"
+            "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'",
+            // The original seed hashed the admin password with hex-decoded salt bytes
+            // while PasswordUtil hashes the salt hex string - so admin123 never
+            // verified. Repair it, but ONLY if the password is still the default
+            // (never overwrite a password the owner already changed).
+            "UPDATE users SET password_hash = 'd4d13358f4ce677cf7532d2633c39ad8987a331c02409c79c5a338e9ff4af8f7' "
+                + "WHERE email = 'admin@canteen.local' "
+                + "AND password_hash = '5764ed82adca085e138c53f05c850cbd16c299ce095959b98778044dd8ea849f'"
         };
         try (Statement st = c.createStatement()) {
             for (String sql : alters) {

@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS feedback (
 -- Admin account: admin@canteen.local / admin123
 -- !!! CHANGE THIS PASSWORD (or delete the row) after first login !!!
 -- Admin account: admin@canteen.local / admin123
--- (hash = SHA-256( hex-decoded salt bytes + "admin123" ), exactly as
---  PasswordUtil.verify() computes it. CHANGE this password after first login.)
+-- (hash = SHA-256( salt_hex_string + "admin123" ), exactly as
+--  PasswordUtil.hash() computes it. CHANGE this password after first login.)
 INSERT IGNORE INTO users (name, email, password_hash, salt, phone, role, email_verified) VALUES
 ('Canteen Admin', 'admin@canteen.local',
- '5764ed82adca085e138c53f05c850cbd16c299ce095959b98778044dd8ea849f',
+ 'd4d13358f4ce677cf7532d2633c39ad8987a331c02409c79c5a338e9ff4af8f7',
  'a2916edd003ffb0d2f2cd5d322f1ca06', '9000000000', 'ADMIN', TRUE);
 
 -- Sample menu (run once - no unique key, re-running would duplicate rows)
