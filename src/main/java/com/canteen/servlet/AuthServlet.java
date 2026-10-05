@@ -3,6 +3,7 @@ package com.canteen.servlet;
 import com.canteen.dao.UserDAO;
 import com.canteen.model.User;
 import com.canteen.util.PasswordUtil;
+import com.canteen.util.SmsUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -83,8 +84,8 @@ public class AuthServlet extends HttpServlet {
             forward(req, resp, "/WEB-INF/jsp/login.jsp");
             return;
         }
-        // Email must be verified before first login (admins are pre-verified).
-        if (!user.isAdmin() && !user.isEmailVerified()) {
+        // Phone must be verified before first login (admins are pre-verified).
+        if (!user.isAdmin() && !user.isPhoneVerified()) {
             resp.sendRedirect(req.getContextPath() + "/verify?email="
                     + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8)
                     + (next != null && !next.isEmpty()
@@ -104,13 +105,16 @@ public class AuthServlet extends HttpServlet {
             throws Exception {
         String name = trim(req.getParameter("name"));
         String email = trim(req.getParameter("email"));
-        String phone = trim(req.getParameter("phone"));
+        String phone = SmsUtil.normalizePhone(trim(req.getParameter("phone")));
         String password = req.getParameter("password");
         String confirm = req.getParameter("confirm");
 
         String err = validate(name, email, password, confirm, phone);
         if (err == null && userDAO.emailExists(email.toLowerCase())) {
             err = "This email is already registered. Try logging in.";
+        }
+        if (err == null && userDAO.phoneExists(phone)) {
+            err = "This phone number is already registered. Try logging in.";
         }
         if (err != null) {
             req.setAttribute("error", err);
@@ -128,9 +132,9 @@ public class AuthServlet extends HttpServlet {
         int id = userDAO.create(u, password);
         u.setId(id);
         u.setRole("STUDENT");
-        // New accounts start unverified: issue a code and send them to /verify.
+        // New accounts start unverified: issue a phone code and send them to /verify.
         // login(req, u) happens only after the code is confirmed (VerifyServlet).
-        VerifyServlet.issueCode(u.getEmail());
+        VerifyServlet.issuePhoneCode(u.getEmail());
         resp.sendRedirect(req.getContextPath() + "/verify?email="
                 + URLEncoder.encode(u.getEmail(), StandardCharsets.UTF_8));
     }
@@ -149,8 +153,8 @@ public class AuthServlet extends HttpServlet {
             return "Please register with your college email (@" + COLLEGE_DOMAIN + ").";
         if (pw == null || pw.length() < 6) return "Password must be at least 6 characters.";
         if (!pw.equals(confirm)) return "Passwords do not match.";
-        if (phone != null && !phone.isEmpty() && !phone.matches("[0-9+\\- ]{7,15}"))
-            return "Please enter a valid phone number.";
+        if (!SmsUtil.isValidIndianMobile(phone))
+            return "Please enter a valid 10-digit mobile number.";
         return null;
     }
 

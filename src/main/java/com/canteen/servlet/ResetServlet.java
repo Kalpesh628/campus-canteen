@@ -2,7 +2,7 @@ package com.canteen.servlet;
 
 import com.canteen.dao.UserDAO;
 import com.canteen.model.User;
-import com.canteen.util.EmailUtil;
+import com.canteen.util.SmsUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,9 +14,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 /**
- * Forgot password, step 2: GET /reset?email=... shows the code + new-password
- * form, POST verifies the code and sets the new password (fresh salt + hash).
- * The reset code is single-use: it is cleared on success.
+ * Forgot password, step 2: GET /reset?phone=... shows the code + new-password
+ * form, POST verifies the code, sets the new password (fresh salt + hash)
+ * and logs the user straight in. The reset code is single-use: it is
+ * cleared on success.
+ *
+ * Phone OTP replaced the email version (2026-10-05). DEMO MODE: the code is
+ * shown on screen because no SMS gateway is configured.
  */
 @WebServlet("/reset")
 public class ResetServlet extends HttpServlet {
@@ -26,13 +30,18 @@ public class ResetServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String email = trim(req.getParameter("email"));
-        req.setAttribute("email", email == null ? "" : email.toLowerCase());
-        // Demo mode: show the code on screen when no SMTP is configured.
-        if (!EmailUtil.isConfigured() && email != null && !email.isEmpty()) {
+        String phone = SmsUtil.normalizePhone(trim(req.getParameter("phone")));
+        req.setAttribute("phone", phone == null ? "" : phone);
+        req.setAttribute("maskedPhone",
+                phone == null ? "" : SmsUtil.maskPhone(phone));
+        // Demo mode: show the code on screen when no SMS gateway is configured.
+        if (!SmsUtil.isConfigured() && phone != null) {
             try {
-                req.setAttribute("demoCode",
-                        userDAO.getLiveResetCode(email.toLowerCase()));
+                User user = userDAO.findByPhone(phone);
+                if (user != null) {
+                    req.setAttribute("demoCode",
+                            userDAO.getLiveResetCode(user.getEmail()));
+                }
             } catch (Exception ignored) { /* never break the page */ }
         }
         req.getRequestDispatcher("/WEB-INF/jsp/reset.jsp").forward(req, resp);
@@ -41,31 +50,35 @@ public class ResetServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String email = trim(req.getParameter("email"));
+        String phone = SmsUtil.normalizePhone(trim(req.getParameter("phone")));
         String code = trim(req.getParameter("code"));
         String pw1 = req.getParameter("newPassword");
         String pw2 = req.getParameter("confirmPassword");
-        if (email != null) email = email.toLowerCase();
 
         String error = null;
         try {
-            if (email == null || email.isEmpty()) {
-                error = "Missing email address. Start again from the forgot-password page.";
+            if (phone == null) {
+                error = "Missing phone number. Start again from the forgot-password page.";
             } else if (pw1 == null || pw1.length() < 6) {
                 error = "Password must be at least 6 characters.";
             } else if (!pw1.equals(pw2)) {
                 error = "The two passwords do not match.";
             } else {
-                String live = userDAO.getLiveResetCode(email);
-                if (code != null && live != null && constantTimeEquals(code, live)) {
-                    User user = userDAO.findByEmail(email);
-                    if (user != null && !"ADMIN".equalsIgnoreCase(user.getRole())) {
-                        userDAO.updatePassword(user.getId(), pw1);
-                        userDAO.clearResetCode(email);
-                        resp.sendRedirect(req.getContextPath()
-                                + "/login?reset=ok");
-                        return;
-                    }
+                User user = userDAO.findByPhone(phone);
+                String live = user == null ? null
+                        : userDAO.getLiveResetCode(user.getEmail());
+                if (user != null && !"ADMIN".equalsIgnoreCase(user.getRole())
+                        && code != null && live != null
+                        && constantTimeEquals(code, live)) {
+                    userDAO.updatePassword(user.getId(), pw1);
+                    userDAO.clearResetCode(user.getEmail());
+                    // Straight in: no need to retype the new password.
+                    User fresh = userDAO.findByPhone(phone);
+                    fresh.setPasswordHash(null);
+                    fresh.setSalt(null);
+                    req.getSession(true).setAttribute("user", fresh);
+                    resp.sendRedirect(req.getContextPath() + "/menu");
+                    return;
                 }
                 error = "Wrong or expired code. Check and try again, or request a fresh one.";
             }
@@ -73,10 +86,16 @@ public class ResetServlet extends HttpServlet {
             error = "Something went wrong. Please try again.";
         }
         req.setAttribute("error", error);
-        req.setAttribute("email", email == null ? "" : email);
-        if (!EmailUtil.isConfigured() && email != null && !email.isEmpty()) {
+        req.setAttribute("phone", phone == null ? "" : phone);
+        req.setAttribute("maskedPhone",
+                phone == null ? "" : SmsUtil.maskPhone(phone));
+        if (!SmsUtil.isConfigured() && phone != null) {
             try {
-                req.setAttribute("demoCode", userDAO.getLiveResetCode(email));
+                User user = userDAO.findByPhone(phone);
+                if (user != null) {
+                    req.setAttribute("demoCode",
+                            userDAO.getLiveResetCode(user.getEmail()));
+                }
             } catch (Exception ignored) { /* never break the page */ }
         }
         req.getRequestDispatcher("/WEB-INF/jsp/reset.jsp").forward(req, resp);

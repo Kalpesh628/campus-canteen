@@ -17,11 +17,13 @@
               <label class="form-label">Email</label>
               <input type="email" class="form-control" name="email" id="email" value="${email}" required
                      placeholder="you@acpce.ac.in">
-              <div class="form-text">Use your college email (@acpce.ac.in) — we'll send a verification code.</div>
+              <div class="form-text">Use your college email (@acpce.ac.in).</div>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Phone</label>
-              <input class="form-control" name="phone" id="phone" value="${phone}" placeholder="9876543210">
+              <label class="form-label">Phone (10-digit mobile)</label>
+              <input class="form-control" name="phone" id="phone" value="${phone}" required
+                     placeholder="9876543210" inputmode="numeric" maxlength="13">
+              <div class="form-text">We'll send a verification code to this number.</div>
             </div>
           </div>
           <div class="row">
@@ -47,9 +49,13 @@ function vReg(){
   var e = document.getElementById('email').value.trim();
   var p = document.getElementById('pw').value;
   var p2 = document.getElementById('pw2').value;
+  var ph = document.getElementById('phone').value.replace(/[^0-9]/g, '');
   if(n.length < 2){ alert('Enter your full name.'); return false; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){ alert('Enter a valid email.'); return false; }
   if(!/@acpce\.ac\.in$/i.test(e)){ alert('Please use your college email (@acpce.ac.in).'); return false; }
+  if(ph.length === 12 && ph.indexOf('91') === 0){ ph = ph.substring(2); }
+  if(ph.length === 11 && ph.charAt(0) === '0'){ ph = ph.substring(1); }
+  if(!/^[6-9][0-9]{9}$/.test(ph)){ alert('Enter a valid 10-digit mobile number.'); return false; }
   if(p.length < 6){ alert('Password must be at least 6 characters.'); return false; }
   if(p !== p2){ alert('Passwords do not match.'); return false; }
   return true;

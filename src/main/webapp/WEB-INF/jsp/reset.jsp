@@ -4,18 +4,18 @@
     <div class="card shadow-sm">
       <div class="card-body p-4">
         <h3 class="card-title mb-2">Reset your password</h3>
-        <p class="text-muted">Enter the 6-digit code sent to <strong>${email}</strong>, then choose a new password.</p>
+        <p class="text-muted">Enter the 6-digit code sent to <strong>${maskedPhone}</strong>, then choose a new password. You'll be logged in right away.</p>
         <c:if test="${not empty error}">
           <div class="alert alert-danger">${error}</div>
         </c:if>
         <c:if test="${not empty demoCode}">
           <div class="alert alert-warning">
-            <strong>Demo mode</strong> — no email server configured, so your code is shown here:
+            <strong>Demo mode</strong> — no SMS gateway configured, so your code is shown here:
             <span class="fs-4 fw-bold d-block mt-1" style="letter-spacing:6px">${demoCode}</span>
           </div>
         </c:if>
         <form method="post" action="${pageContext.request.contextPath}/reset">
-          <input type="hidden" name="email" value="${email}">
+          <input type="hidden" name="phone" value="${phone}">
           <div class="mb-3">
             <label class="form-label">6-digit code</label>
             <input class="form-control form-control-lg text-center" name="code" inputmode="numeric"
@@ -35,7 +35,7 @@
           <button class="btn btn-success w-100">Set new password</button>
         </form>
         <form method="post" action="${pageContext.request.contextPath}/forgot" class="mt-2">
-          <input type="hidden" name="email" value="${email}">
+          <input type="hidden" name="phone" value="${phone}">
           <button class="btn btn-link w-100">Didn't get the code? Send a fresh one</button>
         </form>
       </div>

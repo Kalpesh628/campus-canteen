@@ -40,7 +40,7 @@ public class UserDAO {
 
     /** Looks up a user by email (for login). Returns null when not found. */
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT id, name, email, password_hash, salt, phone, role, email_verified, created_at "
+        String sql = "SELECT id, name, email, password_hash, salt, phone, role, email_verified, phone_verified, created_at "
                    + "FROM users WHERE email = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -63,7 +63,7 @@ public class UserDAO {
     }
 
     public User findById(int id) throws SQLException {
-        String sql = "SELECT id, name, email, password_hash, salt, phone, role, email_verified, created_at "
+        String sql = "SELECT id, name, email, password_hash, salt, phone, role, email_verified, phone_verified, created_at "
                    + "FROM users WHERE id = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -172,9 +172,46 @@ public class UserDAO {
         u.setRole(rs.getString("role"));
         try { u.setEmailVerified(rs.getBoolean("email_verified")); }
         catch (SQLException ignored) { u.setEmailVerified(false); }
+        try { u.setPhoneVerified(rs.getBoolean("phone_verified")); }
+        catch (SQLException ignored) { u.setPhoneVerified(false); }
         if (rs.getTimestamp("created_at") != null) {
             u.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         }
         return u;
+    }
+
+    /** Looks up a student by their 10-digit phone number. Returns null when not found. */
+    public User findByPhone(String phone) throws SQLException {
+        String sql = "SELECT id, name, email, password_hash, salt, phone, role, email_verified, phone_verified, created_at "
+                   + "FROM users WHERE phone = ?";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? map(rs) : null;
+            }
+        }
+    }
+
+    public boolean phoneExists(String phone) throws SQLException {
+        String sql = "SELECT 1 FROM users WHERE phone = ?";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    /** Marks the phone verified and clears the one-time code. */
+    public void markPhoneVerified(String email) throws SQLException {
+        String sql = "UPDATE users SET phone_verified = TRUE, verify_code = NULL, "
+                   + "verify_expires = NULL WHERE email = ?";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.executeUpdate();
+        }
     }
 }

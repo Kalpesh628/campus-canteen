@@ -69,6 +69,10 @@ public class SchemaInitListener implements ServletContextListener {
             "ALTER TABLE users ADD COLUMN verify_expires TIMESTAMP NULL",
             "ALTER TABLE users ADD COLUMN reset_code CHAR(6)",
             "ALTER TABLE users ADD COLUMN reset_expires TIMESTAMP NULL",
+            // Phone verification (2026-10-05): email OTP is replaced by phone OTP.
+            "ALTER TABLE users ADD COLUMN phone_verified BOOLEAN NOT NULL DEFAULT FALSE",
+            // Existing email-verified students keep their access under the new gate.
+            "UPDATE users SET phone_verified = TRUE WHERE email_verified = TRUE",
             // Admin credentials set by the owner (2026-10-05). Self-disabling:
             // after it runs once the email is no longer admin@canteen.local,
             // so future deploys match zero rows and never overwrite the owner.

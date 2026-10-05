@@ -16,7 +16,8 @@ public class User implements Serializable {
     private String salt;
     private String phone;
     private String role;         // "STUDENT" or "ADMIN"
-    private boolean emailVerified;
+    private boolean emailVerified;   // legacy: kept for old rows, no longer gated
+    private boolean phoneVerified;   // phone OTP confirmed - required to log in
     private LocalDateTime createdAt;
 
     public int getId() { return id; }
@@ -42,6 +43,9 @@ public class User implements Serializable {
 
     public boolean isEmailVerified() { return emailVerified; }
     public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public boolean isPhoneVerified() { return phoneVerified; }
+    public void setPhoneVerified(boolean phoneVerified) { this.phoneVerified = phoneVerified; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
