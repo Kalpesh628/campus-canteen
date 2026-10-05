@@ -125,6 +125,42 @@ public class UserDAO {
         }
     }
 
+    /** Stores a password-reset code with expiry (forgot-password step 1). */
+    public void setResetCode(String email, String code, java.time.LocalDateTime expires)
+            throws SQLException {
+        String sql = "UPDATE users SET reset_code = ?, reset_expires = ? WHERE email = ?";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, code);
+            ps.setTimestamp(2, java.sql.Timestamp.valueOf(expires));
+            ps.setString(3, email);
+            ps.executeUpdate();
+        }
+    }
+
+    /** Returns the live (unexpired) password-reset code for an email, or null. */
+    public String getLiveResetCode(String email) throws SQLException {
+        String sql = "SELECT reset_code FROM users WHERE email = ? "
+                   + "AND reset_expires > NOW()";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getString(1) : null;
+            }
+        }
+    }
+
+    /** Clears the reset code (single-use: called after a successful reset). */
+    public void clearResetCode(String email) throws SQLException {
+        String sql = "UPDATE users SET reset_code = NULL, reset_expires = NULL WHERE email = ?";
+        try (Connection c = DBUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.executeUpdate();
+        }
+    }
+
     private User map(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));

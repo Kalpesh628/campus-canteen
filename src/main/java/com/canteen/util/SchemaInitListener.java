@@ -67,6 +67,8 @@ public class SchemaInitListener implements ServletContextListener {
             "ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT FALSE",
             "ALTER TABLE users ADD COLUMN verify_code CHAR(6)",
             "ALTER TABLE users ADD COLUMN verify_expires TIMESTAMP NULL",
+            "ALTER TABLE users ADD COLUMN reset_code CHAR(6)",
+            "ALTER TABLE users ADD COLUMN reset_expires TIMESTAMP NULL",
             "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'",
             // The original seed hashed the admin password with hex-decoded salt bytes
             // while PasswordUtil hashes the salt hex string - so admin123 never

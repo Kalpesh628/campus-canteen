@@ -4,9 +4,6 @@
     <div class="card shadow-sm">
       <div class="card-body p-4">
         <h3 class="card-title mb-3">Student Login</h3>
-        <c:if test="${param.reset == 'ok'}">
-          <div class="alert alert-success">Password reset successful. Please log in with your new password.</div>
-        </c:if>
         <c:if test="${not empty error}">
           <div class="alert alert-danger">${error}</div>
         </c:if>
@@ -24,8 +21,7 @@
           </div>
           <button class="btn btn-success w-100">Login</button>
         </form>
-        <p class="mt-3 mb-1 text-center"><a href="${pageContext.request.contextPath}/forgot">Forgot password?</a></p>
-        <p class="mt-0 mb-0 text-center">New here? <a href="${pageContext.request.contextPath}/register">Create an account</a></p>
+        <p class="mt-3 mb-0 text-center">New here? <a href="${pageContext.request.contextPath}/register">Create an account</a></p>
       </div>
     </div>
   </div>
