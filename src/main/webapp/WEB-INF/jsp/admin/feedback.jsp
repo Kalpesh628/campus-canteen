@@ -11,7 +11,7 @@
         <c:forEach var="f" items="${feedbacks}">
           <tr>
             <td><a href="${pageContext.request.contextPath}/admin/orders?id=${f.orderId}">#${f.orderId}</a></td>
-            <td>${f.userName}</td>
+            <td><c:out value="${f.userName}"/></td>
             <td>
               <c:choose>
                 <c:when test="${f.rating >= 4}"><span class="badge bg-success">${f.rating} / 5</span></c:when>

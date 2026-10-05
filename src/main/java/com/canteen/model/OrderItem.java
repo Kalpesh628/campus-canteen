@@ -30,6 +30,12 @@ public class OrderItem {
     public BigDecimal getPriceAtOrder() { return priceAtOrder; }
     public void setPriceAtOrder(BigDecimal priceAtOrder) { this.priceAtOrder = priceAtOrder; }
 
+    /** Derived line total (price x qty); kept in the model so JSPs never do math. */
+    public BigDecimal getLineTotal() {
+        if (priceAtOrder == null) return BigDecimal.ZERO;
+        return priceAtOrder.multiply(BigDecimal.valueOf(qty));
+    }
+
     public BigDecimal lineTotal() {
         return priceAtOrder.multiply(BigDecimal.valueOf(qty));
     }

@@ -43,7 +43,7 @@
                 </c:if>
               </a>
             </li>
-            <li class="nav-item"><span class="nav-link text-light">Hi, ${sessionScope.user.name}!</span></li>
+            <li class="nav-item"><span class="nav-link text-light">Hi, <c:out value="${sessionScope.user.name}"/>!</span></li>
             <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/logout">Logout</a></li>
           </c:otherwise>
         </c:choose>

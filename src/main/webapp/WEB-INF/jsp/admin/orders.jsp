@@ -15,7 +15,7 @@
   <tbody>
     <c:forEach var="o" items="${orders}">
       <tr>
-        <td>${o.id}</td><td>${o.userName}</td>
+        <td>${o.id}</td><td><c:out value="${o.userName}"/></td>
         <td>${o.slot.slotDate} ${o.slot.label}</td>
         <td>&#8377;<fmt:formatNumber value="${o.total}" minFractionDigits="2"/></td>
         <td>

@@ -55,36 +55,10 @@
 </div>
 
 <script>
-// Rebuild the slot list when the date changes, without reloading the page.
-document.querySelectorAll('a.btn').forEach(function(a){
-  if(!a.href.includes('/checkout?date=')) return;
-  a.addEventListener('click', function(ev){
-    ev.preventDefault();
-    var url = new URL(a.href);
-    var date = url.searchParams.get('date');
-    document.querySelectorAll('a.btn').forEach(function(x){ x.className = x.className.replace('btn-success','btn-outline-success'); });
-    a.className = a.className.replace('btn-outline-success','btn-success');
-    fetch('${pageContext.request.contextPath}/slots?date=' + date)
-      .then(function(r){ return r.json(); })
-      .then(function(slots){
-        var box = document.getElementById('slotList');
-        box.innerHTML = '';
-        if(slots.length === 0){
-          box.innerHTML = '<div class="alert alert-warning mb-0">No slots for this date yet.</div>';
-          return;
-        }
-        slots.forEach(function(s){
-          var full = s.remaining <= 0;
-          var lbl = document.createElement('label');
-          lbl.className = 'list-group-item' + (full ? ' disabled text-muted' : '');
-          lbl.innerHTML = '<input class="form-check-input me-2" type="radio" name="slotId" value="' + s.id + '"' + (full ? ' disabled' : '') + '>'
-            + '<strong>' + s.label + '</strong> '
-            + '<span class="badge ' + (full ? 'bg-danger' : 'bg-success') + ' ms-2">' + (full ? 'FULL' : s.remaining + ' left') + '</span>';
-          box.appendChild(lbl);
-        });
-      });
-  });
-});
+// Date buttons are plain links: the server re-renders the slot list for the
+// chosen date on every click, so the highlighted date and the slots shown can
+// never go out of sync (an in-place AJAX rebuild could leave stale slots
+// under a newly-highlighted date, silently booking the wrong day).
 function vSlot(){
   if(!document.querySelector('input[name=slotId]:checked')){ alert('Please choose a pickup slot.'); return false; }
   return true;
