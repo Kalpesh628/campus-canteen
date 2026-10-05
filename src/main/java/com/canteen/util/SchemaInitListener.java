@@ -69,6 +69,21 @@ public class SchemaInitListener implements ServletContextListener {
             "ALTER TABLE users ADD COLUMN verify_expires TIMESTAMP NULL",
             "ALTER TABLE users ADD COLUMN reset_code CHAR(6)",
             "ALTER TABLE users ADD COLUMN reset_expires TIMESTAMP NULL",
+            // One-time cleanup (2026-10-05): remove test accounts created during
+            // development, plus any orders/feedback they placed (FK-safe order).
+            // Explicit emails only - never touches the admin or future students.
+            // Idempotent: matches zero rows once the accounts are gone.
+            "DELETE oi FROM order_items oi "
+                + "JOIN orders o ON oi.order_id = o.id "
+                + "JOIN users u ON o.user_id = u.id "
+                + "WHERE u.email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
+            "DELETE o FROM orders o "
+                + "JOIN users u ON o.user_id = u.id "
+                + "WHERE u.email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
+            "DELETE f FROM feedback f "
+                + "JOIN users u ON f.user_id = u.id "
+                + "WHERE u.email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
+            "DELETE FROM users WHERE email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
             "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'",
             // The original seed hashed the admin password with hex-decoded salt bytes
             // while PasswordUtil hashes the salt hex string - so admin123 never
