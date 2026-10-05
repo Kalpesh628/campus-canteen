@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.logging.Logger;
@@ -37,11 +38,13 @@ public class SchemaInitListener implements ServletContextListener {
             if (tableExists(c, "users")) {
                 LOG.info("SchemaInit: tables already present, applying column migrations if needed.");
                 migrateUserColumns(c);
+                bootstrapAdminFromEnv(c);
                 return;
             }
             LOG.info("SchemaInit: empty database detected, creating schema...");
             runScript(c);
-            LOG.info("SchemaInit: done. Default admin: admin@canteen.local / admin123 (CHANGE IT).");
+            bootstrapAdminFromEnv(c);
+            LOG.info("SchemaInit: done. Seed admin is local-dev only; production uses ADMIN_EMAIL/ADMIN_PASSWORD env.");
         } catch (Exception e) {
             // Don't kill the deploy if the DB isn't reachable yet; the app
             // will surface connection errors normally on first request.
@@ -73,13 +76,8 @@ public class SchemaInitListener implements ServletContextListener {
             "ALTER TABLE users ADD COLUMN phone_verified BOOLEAN NOT NULL DEFAULT FALSE",
             // Existing email-verified students keep their access under the new gate.
             "UPDATE users SET phone_verified = TRUE WHERE email_verified = TRUE",
-            // Admin credentials set by the owner (2026-10-05). Self-disabling:
-            // after it runs once the email is no longer admin@canteen.local,
-            // so future deploys match zero rows and never overwrite the owner.
-            "UPDATE users SET email = 'admin@kptimes.in', "
-                + "salt = '474432a8b1c50b1d05134c4388795e76', "
-                + "password_hash = '515e88522c35d346e6a673e43bcca6d1827bb5009ec3d02c8720f66036f78197' "
-                + "WHERE role = 'ADMIN' AND email = 'admin@canteen.local'",
+            // Admin credentials are bootstrapped from ADMIN_EMAIL / ADMIN_PASSWORD
+            // env vars (bootstrapAdminFromEnv) - never hardcoded in the repo.
             // One-time cleanup (2026-10-05): remove test accounts created during
             // development, plus any orders/feedback they placed (FK-safe order).
             // Explicit emails only - never touches the admin or future students.
@@ -119,6 +117,74 @@ public class SchemaInitListener implements ServletContextListener {
             }
         } catch (Exception e) {
             LOG.severe("SchemaInit migration failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * One-time private admin bootstrap. If ADMIN_EMAIL and ADMIN_PASSWORD env
+     * vars are set (e.g. Railway Variables), the admin account is created or
+     * repointed to them with a freshly generated salt+hash. The password never
+     * appears in the repo, logs, or client-visible output. Safe to run on every
+     * boot: it only acts when the env vars are present.
+     */
+    private void bootstrapAdminFromEnv(Connection c) {
+        String email = System.getenv("ADMIN_EMAIL");
+        String pass = System.getenv("ADMIN_PASSWORD");
+        if (email == null || email.isBlank() || pass == null || pass.isBlank()) {
+            return;
+        }
+        email = email.trim().toLowerCase();
+        try {
+            String salt = PasswordUtil.generateSalt();
+            String hash = PasswordUtil.hash(pass, salt);
+            // 1. Admin with this email already exists -> rotate password only.
+            try (PreparedStatement q = c.prepareStatement(
+                    "SELECT id FROM users WHERE role = 'ADMIN' AND email = ?")) {
+                q.setString(1, email);
+                try (ResultSet rs = q.executeQuery()) {
+                    if (rs.next()) {
+                        try (PreparedStatement u = c.prepareStatement(
+                                "UPDATE users SET salt = ?, password_hash = ?, phone_verified = TRUE WHERE id = ?")) {
+                            u.setString(1, salt);
+                            u.setString(2, hash);
+                            u.setInt(3, rs.getInt("id"));
+                            u.executeUpdate();
+                        }
+                        LOG.info("SchemaInit: admin password set from ADMIN_PASSWORD env.");
+                        return;
+                    }
+                }
+            }
+            // 2. Some other ADMIN exists (e.g. the local seed) -> repoint it.
+            try (PreparedStatement q = c.prepareStatement(
+                    "SELECT id FROM users WHERE role = 'ADMIN' LIMIT 1")) {
+                try (ResultSet rs = q.executeQuery()) {
+                    if (rs.next()) {
+                        try (PreparedStatement u = c.prepareStatement(
+                                "UPDATE users SET email = ?, salt = ?, password_hash = ?, phone_verified = TRUE WHERE id = ?")) {
+                            u.setString(1, email);
+                            u.setString(2, salt);
+                            u.setString(3, hash);
+                            u.setInt(4, rs.getInt("id"));
+                            u.executeUpdate();
+                        }
+                        LOG.info("SchemaInit: admin account repointed to ADMIN_EMAIL env.");
+                        return;
+                    }
+                }
+            }
+            // 3. No admin at all -> create one.
+            try (PreparedStatement ins = c.prepareStatement(
+                    "INSERT INTO users (name, email, password_hash, salt, phone, role, phone_verified) "
+                    + "VALUES ('Canteen Admin', ?, ?, ?, '', 'ADMIN', TRUE)")) {
+                ins.setString(1, email);
+                ins.setString(2, hash);
+                ins.setString(3, salt);
+                ins.executeUpdate();
+            }
+            LOG.info("SchemaInit: admin account created from ADMIN_EMAIL env.");
+        } catch (Exception e) {
+            LOG.severe("SchemaInit admin bootstrap failed: " + e.getMessage());
         }
     }
 

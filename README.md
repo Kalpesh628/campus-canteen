@@ -42,8 +42,10 @@ slots for today + 2 days. The app reads these credentials from
 `src/main/resources/db.properties` — edit that file if your MySQL user differs,
 then rebuild.
 
-**Default admin:** `admin@canteen.local` / `admin123` — change it after first login
-(update the row in `users`, or register a new admin directly in SQL).
+**Default admin (local dev only):** `admin@canteen.local` / `admin123` — change it after first login.
+**Production:** set `ADMIN_EMAIL` and `ADMIN_PASSWORD` env vars (e.g. Railway Variables);
+on boot the app creates/repoints the admin account with a freshly generated salt+hash.
+The password is never stored in the repo.
 
 ## 2. Build
 
@@ -170,8 +172,10 @@ and this repo pushed to GitHub.
    only falls back to `db.properties` locally, so no code change is needed.
 4. **Create the tables** — connect to the Railway MySQL once (Railway gives a
    one-click connect command / web console) and run `schema.sql`.
-5. **Open the app** — Railway assigns a public `*.up.railway.app` URL.
-   Log in as `admin@canteen.local` / `admin123` and change the password.
+5. **Set the admin credentials** — in Railway Variables add `ADMIN_EMAIL` and
+   `ADMIN_PASSWORD`; on next boot the app provisions the admin account from them.
+6. **Open the app** — Railway assigns a public `*.up.railway.app` URL and you can
+   log in with the admin email you configured.
 
 Notes:
 - Railway assigns the HTTP port via the `$PORT` env var; the Dockerfile rewrites

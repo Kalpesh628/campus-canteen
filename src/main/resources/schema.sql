@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS users (
   email_verified BOOLEAN NOT NULL DEFAULT FALSE,
   verify_code   CHAR(6),
   verify_expires TIMESTAMP NULL,
+  reset_code    CHAR(6),
+  reset_expires TIMESTAMP NULL,
+  phone_verified BOOLEAN NOT NULL DEFAULT FALSE,
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -93,9 +96,11 @@ CREATE TABLE IF NOT EXISTS feedback (
 -- SEED DATA
 -- ============================================================
 
--- Admin account: admin@canteen.local / admin123
+-- Seed admin (local dev only). Production sets ADMIN_EMAIL/ADMIN_PASSWORD env vars;
+-- see SchemaInitListener.bootstrapAdminFromEnv. Change this password after first login.
 -- !!! CHANGE THIS PASSWORD (or delete the row) after first login !!!
--- Admin account: admin@canteen.local / admin123
+-- Seed admin (local dev only). Production sets ADMIN_EMAIL/ADMIN_PASSWORD env vars;
+-- see SchemaInitListener.bootstrapAdminFromEnv. Change this password after first login.
 -- (hash = SHA-256( hex-decoded salt bytes + "admin123" ), exactly as
 --  PasswordUtil.verify() computes it. CHANGE this password after first login.)
 INSERT IGNORE INTO users (name, email, password_hash, salt, phone, role, email_verified) VALUES
