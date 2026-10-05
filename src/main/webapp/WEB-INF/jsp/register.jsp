@@ -10,18 +10,18 @@
         <form method="post" action="${pageContext.request.contextPath}/register" onsubmit="return vReg()">
           <div class="mb-3">
             <label class="form-label">Full name</label>
-            <input class="form-control" name="name" id="name" value="${name}" required>
+            <input class="form-control" name="name" id="name" value="<c:out value='${name}'/>" required>
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" id="email" value="${email}" required
+              <input type="email" class="form-control" name="email" id="email" value="<c:out value='${email}'/>" required
                      placeholder="you@acpce.ac.in">
               <div class="form-text">Use your college email (@acpce.ac.in).</div>
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label">Phone (10-digit mobile)</label>
-              <input class="form-control" name="phone" id="phone" value="${phone}" required
+              <input class="form-control" name="phone" id="phone" value="<c:out value='${phone}'/>" required
                      placeholder="9876543210" inputmode="numeric" maxlength="13">
               <div class="form-text">We'll send a verification code to this number.</div>
             </div>

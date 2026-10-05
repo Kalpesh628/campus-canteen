@@ -4,7 +4,7 @@
 <c:if test="${order.status == 'REJECTED'}">
   <div class="alert alert-danger">Rejected. Reason: ${order.rejectReason}</div>
 </c:if>
-<c:if test="${not empty order.note}"><div class="alert alert-info">Kitchen note: ${order.note}</div></c:if>
+<c:if test="${not empty order.note}"><div class="alert alert-info">Kitchen note: <c:out value="${order.note}"/></div></c:if>
 
 <table class="table">
   <thead><tr><th>Dish</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>

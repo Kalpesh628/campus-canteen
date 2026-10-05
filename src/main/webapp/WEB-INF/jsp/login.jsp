@@ -11,7 +11,7 @@
           <div class="alert alert-danger">${error}</div>
         </c:if>
         <form method="post" action="${pageContext.request.contextPath}/login" onsubmit="return vLogin()">
-          <input type="hidden" name="next" value="${next}">
+          <input type="hidden" name="next" value="<c:out value='${next}'/>">
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email" class="form-control" name="email" id="email" required

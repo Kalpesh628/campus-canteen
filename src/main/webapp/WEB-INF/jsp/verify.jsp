@@ -19,8 +19,8 @@
         </c:if>
         <form method="post" action="${pageContext.request.contextPath}/verify">
           <input type="hidden" name="action" value="verify">
-          <input type="hidden" name="email" value="${email}">
-          <input type="hidden" name="next" value="${next}">
+          <input type="hidden" name="email" value="<c:out value='${email}'/>">
+          <input type="hidden" name="next" value="<c:out value='${next}'/>">
           <div class="mb-3">
             <label class="form-label">6-digit code</label>
             <input class="form-control form-control-lg text-center" name="code" inputmode="numeric"
@@ -31,8 +31,8 @@
         </form>
         <form method="post" action="${pageContext.request.contextPath}/verify" class="mt-2">
           <input type="hidden" name="action" value="resend">
-          <input type="hidden" name="email" value="${email}">
-          <input type="hidden" name="next" value="${next}">
+          <input type="hidden" name="email" value="<c:out value='${email}'/>">
+          <input type="hidden" name="next" value="<c:out value='${next}'/>">
           <button class="btn btn-link w-100">Didn't get the code? Resend</button>
         </form>
       </div>

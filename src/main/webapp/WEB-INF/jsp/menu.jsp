@@ -3,7 +3,7 @@
 
 <form class="row g-2 mb-4" method="get" action="${pageContext.request.contextPath}/menu">
   <div class="col-md-5">
-    <input class="form-control" name="q" placeholder="Search dishes..." value="${q}">
+    <input class="form-control" name="q" placeholder="Search dishes..." value="<c:out value='${q}'/>">
   </div>
   <div class="col-md-3">
     <select class="form-select" name="category">

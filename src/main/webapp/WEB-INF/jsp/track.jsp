@@ -47,7 +47,7 @@
       <span>Payment: <strong>Pay at Canteen</strong></span>
       <h5>Total: <span class="text-success">&#8377;<fmt:formatNumber value="${order.total}" minFractionDigits="2"/></span></h5>
     </div>
-    <c:if test="${not empty order.note}"><p class="text-muted">Note: ${order.note}</p></c:if>
+    <c:if test="${not empty order.note}"><p class="text-muted">Note: <c:out value="${order.note}"/></p></c:if>
   </div>
 </div>
 <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/orders">Back to My Orders</a>
