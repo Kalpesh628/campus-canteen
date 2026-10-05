@@ -93,6 +93,26 @@ public class SchemaInitListener implements ServletContextListener {
                 + "JOIN users u ON f.user_id = u.id "
                 + "WHERE u.email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
             "DELETE FROM users WHERE email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
+            // QA sweep cleanup (2026-10-05): remove all accounts created by the
+            // Phase-1 and 10-tester Phase-2 QA runs, plus their orders/feedback
+            // (FK-safe order). Idempotent: matches zero rows once gone.
+            // The LIKE patterns only match the qa10t*/qatest* test prefixes.
+            "DELETE oi FROM order_items oi "
+                + "JOIN orders o ON oi.order_id = o.id "
+                + "JOIN users u ON o.user_id = u.id "
+                + "WHERE u.email LIKE 'qatest%@acpce.ac.in' OR u.email LIKE 'qa10t%@acpce.ac.in'",
+            "DELETE o FROM orders o "
+                + "JOIN users u ON o.user_id = u.id "
+                + "WHERE u.email LIKE 'qatest%@acpce.ac.in' OR u.email LIKE 'qa10t%@acpce.ac.in'",
+            "DELETE f FROM feedback f "
+                + "JOIN users u ON f.user_id = u.id "
+                + "WHERE u.email LIKE 'qatest%@acpce.ac.in' OR u.email LIKE 'qa10t%@acpce.ac.in'",
+            "DELETE FROM users WHERE email LIKE 'qatest%@acpce.ac.in' OR email LIKE 'qa10t%@acpce.ac.in'",
+            "DELETE oi FROM order_items oi JOIN orders o ON oi.order_id = o.id "
+                + "JOIN users u ON o.user_id = u.id WHERE u.email LIKE '%<script>%'",
+            "DELETE o FROM orders o JOIN users u ON o.user_id = u.id WHERE u.email LIKE '%<script>%'",
+            "DELETE f FROM feedback f JOIN users u ON f.user_id = u.id WHERE u.email LIKE '%<script>%'",
+            "DELETE FROM users WHERE email LIKE '%<script>%'",
             "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'",
             // The original seed hashed the admin password with hex-decoded salt bytes
             // while PasswordUtil hashes the salt hex string - so admin123 never
