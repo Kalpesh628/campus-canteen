@@ -13,6 +13,12 @@
   <session-config>
     <!-- idle sessions die after 30 minutes -->
     <session-timeout>30</session-timeout>
+    <cookie-config>
+      <!-- session cookie never leaves HTTPS, never readable from JS -->
+      <http-only>true</http-only>
+      <secure>true</secure>
+      <same-site>LAX</same-site>
+    </cookie-config>
   </session-config>
 
   <!--

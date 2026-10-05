@@ -72,6 +72,11 @@ public class OrderServlet extends HttpServlet {
         if (!dates.contains(chosen)) chosen = dates.get(0);
 
         List<PickupSlot> slots = slotDAO.findByDateWithRemaining(chosen);
+        // M-1: don't offer time slots that have already elapsed today.
+        if (chosen.equals(java.time.LocalDate.now())) {
+            java.time.LocalTime now = java.time.LocalTime.now();
+            slots.removeIf(slot -> slot.getEndTime() != null && !slot.getEndTime().isAfter(now));
+        }
         req.setAttribute("dates", dates);
         req.setAttribute("chosenDate", chosen);
         req.setAttribute("slots", slots);

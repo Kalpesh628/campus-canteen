@@ -48,16 +48,23 @@ public class OrderDAO {
 
             // 1+2. Lock slot row and verify capacity atomically.
             try (PreparedStatement lock = c.prepareStatement(
-                    "SELECT max_orders, active, slot_date FROM pickup_slots WHERE id = ? FOR UPDATE")) {
+                    "SELECT max_orders, active, slot_date, end_time FROM pickup_slots WHERE id = ? FOR UPDATE")) {
                 lock.setInt(1, slotId);
                 try (ResultSet rs = lock.executeQuery()) {
                     if (!rs.next() || !rs.getBoolean("active")) {
                         c.rollback();
                         throw new SQLException("This pickup slot is no longer available.");
                     }
-                    // Never allow booking a slot whose date has already passed.
+                    // Never allow booking a slot whose date has passed, or whose
+                    // time has already elapsed today (M-1).
                     java.sql.Date slotDate = rs.getDate("slot_date");
-                    if (slotDate == null || slotDate.toLocalDate().isBefore(java.time.LocalDate.now())) {
+                    java.sql.Time endTime = rs.getTime("end_time");
+                    boolean expired = slotDate == null
+                            || slotDate.toLocalDate().isBefore(java.time.LocalDate.now())
+                            || (slotDate.toLocalDate().isEqual(java.time.LocalDate.now())
+                                && endTime != null
+                                && !endTime.toLocalTime().isAfter(java.time.LocalTime.now()));
+                    if (expired) {
                         c.rollback();
                         throw new SQLException("This pickup slot is no longer available.");
                     }

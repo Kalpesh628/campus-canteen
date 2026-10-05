@@ -8,6 +8,7 @@
           <div class="alert alert-danger">${error}</div>
         </c:if>
         <form method="post" action="${pageContext.request.contextPath}/register" onsubmit="return vReg()">
+          <input type="hidden" name="csrfToken" value="${csrfToken}">
           <div class="mb-3">
             <label class="form-label">Full name</label>
             <input class="form-control" name="name" id="name" value="<c:out value='${name}'/>" required>

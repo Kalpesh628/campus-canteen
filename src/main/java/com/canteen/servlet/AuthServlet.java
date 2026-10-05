@@ -2,6 +2,7 @@ package com.canteen.servlet;
 
 import com.canteen.dao.UserDAO;
 import com.canteen.model.User;
+import com.canteen.util.CsrfUtil;
 import com.canteen.util.PasswordUtil;
 import com.canteen.util.SmsUtil;
 import jakarta.servlet.RequestDispatcher;
@@ -34,8 +35,15 @@ public class AuthServlet extends HttpServlet {
             throws ServletException, IOException {
         String path = req.getServletPath();
         switch (path) {
-            case "/login" -> forward(req, resp, "/WEB-INF/jsp/login.jsp");
-            case "/register" -> forward(req, resp, "/WEB-INF/jsp/register.jsp");
+            case "/login" -> {
+                req.setAttribute("next", trim(req.getParameter("next")));
+                req.setAttribute("csrfToken", CsrfUtil.tokenFor(req.getSession(true)));
+                forward(req, resp, "/WEB-INF/jsp/login.jsp");
+            }
+            case "/register" -> {
+                req.setAttribute("csrfToken", CsrfUtil.tokenFor(req.getSession(true)));
+                forward(req, resp, "/WEB-INF/jsp/register.jsp");
+            }
             case "/logout" -> {
                 HttpSession s = req.getSession(false);
                 if (s != null) s.invalidate();
@@ -64,6 +72,12 @@ public class AuthServlet extends HttpServlet {
 
     private void doLogin(HttpServletRequest req, HttpServletResponse resp)
             throws Exception {
+        if (!CsrfUtil.valid(req)) {
+            req.setAttribute("error", "Session expired. Please try again.");
+            req.setAttribute("csrfToken", CsrfUtil.tokenFor(req.getSession(true)));
+            forward(req, resp, "/WEB-INF/jsp/login.jsp");
+            return;
+        }
         String email = trim(req.getParameter("email"));
         String password = req.getParameter("password");
         String next = trim(req.getParameter("next"));
@@ -116,11 +130,15 @@ public class AuthServlet extends HttpServlet {
         if (err == null && userDAO.phoneExists(phone)) {
             err = "This phone number is already registered. Try logging in.";
         }
+        if (!CsrfUtil.valid(req)) {
+            err = "Session expired. Please try again.";
+        }
         if (err != null) {
             req.setAttribute("error", err);
             req.setAttribute("name", name);
             req.setAttribute("email", email);
             req.setAttribute("phone", phone);
+            req.setAttribute("csrfToken", CsrfUtil.tokenFor(req.getSession(true)));
             forward(req, resp, "/WEB-INF/jsp/register.jsp");
             return;
         }
@@ -135,6 +153,9 @@ public class AuthServlet extends HttpServlet {
         // New accounts start unverified: issue a phone code and send them to /verify.
         // login(req, u) happens only after the code is confirmed (VerifyServlet).
         VerifyServlet.issuePhoneCode(u.getEmail());
+        // Bind the pending verification to this session so only the
+        // registering browser can view/submit the OTP (C-1 fix).
+        req.getSession(true).setAttribute("pendingVerifyEmail", u.getEmail());
         resp.sendRedirect(req.getContextPath() + "/verify?email="
                 + URLEncoder.encode(u.getEmail(), StandardCharsets.UTF_8));
     }
@@ -147,7 +168,7 @@ public class AuthServlet extends HttpServlet {
     /** Server-side validation (the JSP also validates in JS - defence in depth). */
     private String validate(String name, String email, String pw, String confirm, String phone) {
         if (name == null || name.length() < 2) return "Please enter your full name.";
-        if (email == null || !email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+"))
+        if (email == null || !email.matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"))
             return "Please enter a valid email address.";
         if (!isCollegeEmail(email))
             return "Please register with your college email (@" + COLLEGE_DOMAIN + ").";

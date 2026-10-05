@@ -48,6 +48,15 @@ public class VerifyServlet extends HttpServlet {
             return;
         }
         email = email.toLowerCase();
+        // C-1: the OTP page is bound to the registering session. A different
+        // browser (or no session) gets bounced to /register instead of seeing
+        // another account's code and masked phone.
+        Object pending = req.getSession(false) == null ? null
+                : req.getSession(false).getAttribute("pendingVerifyEmail");
+        if (!email.equals(pending)) {
+            resp.sendRedirect(req.getContextPath() + "/register");
+            return;
+        }
         req.setAttribute("email", email);
         req.setAttribute("next", trim(req.getParameter("next")));
         try {
@@ -75,6 +84,13 @@ public class VerifyServlet extends HttpServlet {
         }
         email = email.toLowerCase();
 
+        Object pending = req.getSession(false) == null ? null
+                : req.getSession(false).getAttribute("pendingVerifyEmail");
+        if (!email.equals(pending)) {
+            resp.sendRedirect(req.getContextPath() + "/register");
+            return;
+        }
+
         try {
             if ("resend".equals(action)) {
                 issuePhoneCode(email);
@@ -88,6 +104,7 @@ public class VerifyServlet extends HttpServlet {
                     user.setPasswordHash(null);
                     user.setSalt(null);
                     req.getSession(true).setAttribute("user", user);
+                    req.getSession(false).removeAttribute("pendingVerifyEmail");
                     resp.sendRedirect(req.getContextPath() + safeNext(next));
                     return;
                 }

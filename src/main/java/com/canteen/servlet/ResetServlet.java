@@ -34,16 +34,8 @@ public class ResetServlet extends HttpServlet {
         req.setAttribute("phone", phone == null ? "" : phone);
         req.setAttribute("maskedPhone",
                 phone == null ? "" : SmsUtil.maskPhone(phone));
-        // Demo mode: show the code on screen when no SMS gateway is configured.
-        if (!SmsUtil.isConfigured() && phone != null) {
-            try {
-                User user = userDAO.findByPhone(phone);
-                if (user != null) {
-                    req.setAttribute("demoCode",
-                            userDAO.getLiveResetCode(user.getEmail()));
-                }
-            } catch (Exception ignored) { /* never break the page */ }
-        }
+        // M-4: never reveal here whether a code exists for this phone.
+        // In demo mode the code is shown once on the /forgot confirmation page.
         req.getRequestDispatcher("/WEB-INF/jsp/reset.jsp").forward(req, resp);
     }
 

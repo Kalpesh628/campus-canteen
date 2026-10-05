@@ -40,6 +40,16 @@ public class ForgotServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        if ("1".equals(req.getParameter("sent"))) {
+            jakarta.servlet.http.HttpSession session = req.getSession(false);
+            req.setAttribute("sent", true);
+            if (session != null) {
+                req.setAttribute("demoCode", session.getAttribute("forgotDemoCode"));
+                req.setAttribute("forgotPhone", session.getAttribute("forgotPhone"));
+                session.removeAttribute("forgotDemoCode");
+                session.removeAttribute("forgotPhone");
+            }
+        }
         req.getRequestDispatcher("/WEB-INF/jsp/forgot.jsp").forward(req, resp);
     }
 
@@ -48,6 +58,7 @@ public class ForgotServlet extends HttpServlet {
             throws ServletException, IOException {
         String phone = SmsUtil.normalizePhone(trim(req.getParameter("phone")));
 
+        String demoCode = null;
         try {
             if (phone != null) {
                 User user = userDAO.findByPhone(phone);
@@ -55,16 +66,21 @@ public class ForgotServlet extends HttpServlet {
                     String code = String.format("%06d", RANDOM.nextInt(1_000_000));
                     userDAO.setResetCode(user.getEmail(), code,
                             LocalDateTime.now().plusMinutes(CODE_TTL_MINUTES));
-                    SmsUtil.sendPasswordResetCode(phone, code);
+                    if (!SmsUtil.sendPasswordResetCode(phone, code)) {
+                        demoCode = code; // demo mode: show once on the next page
+                    }
                 }
             }
         } catch (Exception e) {
             // Deliberately generic: never reveal whether the phone exists.
         }
-        // Same destination either way - no account enumeration.
-        resp.sendRedirect(req.getContextPath() + "/reset?phone="
-                + java.net.URLEncoder.encode(phone == null ? "" : phone,
-                        java.nio.charset.StandardCharsets.UTF_8));
+        // Neutral landing: identical whether or not the phone is registered,
+        // so the endpoint can't be used to enumerate accounts (M-4).
+        if (demoCode != null) {
+            req.getSession(true).setAttribute("forgotDemoCode", demoCode);
+        }
+        req.getSession(true).setAttribute("forgotPhone", phone == null ? "" : phone);
+        resp.sendRedirect(req.getContextPath() + "/forgot?sent=1");
     }
 
     private String trim(String s) {
