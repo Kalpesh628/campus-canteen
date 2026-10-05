@@ -69,6 +69,13 @@ public class SchemaInitListener implements ServletContextListener {
             "ALTER TABLE users ADD COLUMN verify_expires TIMESTAMP NULL",
             "ALTER TABLE users ADD COLUMN reset_code CHAR(6)",
             "ALTER TABLE users ADD COLUMN reset_expires TIMESTAMP NULL",
+            // Admin credentials set by the owner (2026-10-05). Self-disabling:
+            // after it runs once the email is no longer admin@canteen.local,
+            // so future deploys match zero rows and never overwrite the owner.
+            "UPDATE users SET email = 'admin@kptimes.in', "
+                + "salt = '474432a8b1c50b1d05134c4388795e76', "
+                + "password_hash = '515e88522c35d346e6a673e43bcca6d1827bb5009ec3d02c8720f66036f78197' "
+                + "WHERE role = 'ADMIN' AND email = 'admin@canteen.local'",
             // One-time cleanup (2026-10-05): remove test accounts created during
             // development, plus any orders/feedback they placed (FK-safe order).
             // Explicit emails only - never touches the admin or future students.
@@ -84,13 +91,6 @@ public class SchemaInitListener implements ServletContextListener {
                 + "JOIN users u ON f.user_id = u.id "
                 + "WHERE u.email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
             "DELETE FROM users WHERE email IN ('maxtest1@example.com', 'kptest1@acpce.ac.in')",
-            // TEMPORARY (2026-10-05): the live admin password was lost, so set a
-            // one-time known password for the login demo. The user will change it
-            // via /admin/password immediately after, then this line MUST be removed
-            // before the next push - otherwise every deploy would reset it back.
-            "UPDATE users SET salt = 'c4f089fb4bc0e480ed91b37985806bb7', "
-                + "password_hash = 'bdbb439bcedff67d02411800469d0b736f3d6cb382b8d1d2f0bdcea517ac9c42' "
-                + "WHERE email = 'admin@canteen.local'",
             "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'",
             // The original seed hashed the admin password with hex-decoded salt bytes
             // while PasswordUtil hashes the salt hex string - so admin123 never
