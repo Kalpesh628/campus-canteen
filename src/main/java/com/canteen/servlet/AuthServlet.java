@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Handles /login, /register and /logout.
@@ -20,6 +22,9 @@ import java.io.IOException;
  */
 @WebServlet({"/login", "/register", "/logout"})
 public class AuthServlet extends HttpServlet {
+
+    /** Only college emails may register / log in as students. */
+    private static final String COLLEGE_DOMAIN = "acpce.ac.in";
 
     private final UserDAO userDAO = new UserDAO();
 
@@ -70,6 +75,22 @@ public class AuthServlet extends HttpServlet {
             forward(req, resp, "/WEB-INF/jsp/login.jsp");
             return;
         }
+        // Students must use a college email; the admin account is exempt.
+        if (!user.isAdmin() && !isCollegeEmail(user.getEmail())) {
+            req.setAttribute("error", "Please log in with your college email (@"
+                    + COLLEGE_DOMAIN + ").");
+            req.setAttribute("next", next);
+            forward(req, resp, "/WEB-INF/jsp/login.jsp");
+            return;
+        }
+        // Email must be verified before first login (admins are pre-verified).
+        if (!user.isAdmin() && !user.isEmailVerified()) {
+            resp.sendRedirect(req.getContextPath() + "/verify?email="
+                    + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8)
+                    + (next != null && !next.isEmpty()
+                        ? "&next=" + URLEncoder.encode(next, StandardCharsets.UTF_8) : ""));
+            return;
+        }
         login(req, user);
         // open-redirect guard: only allow relative targets inside this app
         if (next != null && next.startsWith("/") && !next.startsWith("//")) {
@@ -107,8 +128,16 @@ public class AuthServlet extends HttpServlet {
         int id = userDAO.create(u, password);
         u.setId(id);
         u.setRole("STUDENT");
-        login(req, u);
-        resp.sendRedirect(req.getContextPath() + "/menu");
+        // New accounts start unverified: issue a code and send them to /verify.
+        // login(req, u) happens only after the code is confirmed (VerifyServlet).
+        VerifyServlet.issueCode(u.getEmail());
+        resp.sendRedirect(req.getContextPath() + "/verify?email="
+                + URLEncoder.encode(u.getEmail(), StandardCharsets.UTF_8));
+    }
+
+    /** College-domain check for student emails (case-insensitive). */
+    private static boolean isCollegeEmail(String email) {
+        return email != null && email.toLowerCase().endsWith("@" + COLLEGE_DOMAIN);
     }
 
     /** Server-side validation (the JSP also validates in JS - defence in depth). */
@@ -116,6 +145,8 @@ public class AuthServlet extends HttpServlet {
         if (name == null || name.length() < 2) return "Please enter your full name.";
         if (email == null || !email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+"))
             return "Please enter a valid email address.";
+        if (!isCollegeEmail(email))
+            return "Please register with your college email (@" + COLLEGE_DOMAIN + ").";
         if (pw == null || pw.length() < 6) return "Password must be at least 6 characters.";
         if (!pw.equals(confirm)) return "Passwords do not match.";
         if (phone != null && !phone.isEmpty() && !phone.matches("[0-9+\\- ]{7,15}"))

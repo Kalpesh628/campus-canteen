@@ -44,4 +44,9 @@ public class CartItem implements Serializable {
     public BigDecimal lineTotal() {
         return price.multiply(BigDecimal.valueOf(qty));
     }
+
+    /** EL-friendly getter: ${it.lineTotal} in cart.jsp resolves to this. */
+    public BigDecimal getLineTotal() {
+        return lineTotal();
+    }
 }

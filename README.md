@@ -130,6 +130,30 @@ Passwords: `PasswordUtil` stores `SHA-256(salt + password)` with a random
   project; a real deployment would use a pool like HikariCP.
 - Payment is "Pay at Canteen" by design — `payment_mode` is fixed at order time.
 - The cart lives in the HTTP session; it does not survive logout.
+- Student accounts are restricted to `@acpce.ac.in` emails (see
+  `AuthServlet.COLLEGE_DOMAIN`) and must verify the email with a 6-digit code
+  before first login. Phone-number OTP is intentionally left for later.
+
+## Email verification (SMTP)
+
+Registration sends a 6-digit verification code. Configure these environment
+variables (Railway: service → Variables) to send real emails:
+
+| Variable    | Example                          |
+|-------------|----------------------------------|
+| `SMTP_HOST` | `smtp.gmail.com`                 |
+| `SMTP_PORT` | `587` (default)                  |
+| `SMTP_USER` | `you@gmail.com`                  |
+| `SMTP_PASS` | Gmail **app password** (see below)|
+| `SMTP_FROM` | `you@gmail.com` (default = user) |
+
+**Gmail app password** (free, 2 minutes): Google Account → Security → turn on
+2-Step Verification → search "App passwords" → create one for "Mail" → paste
+the 16-letter code as `SMTP_PASS`. Never use your real Gmail password.
+
+**Demo mode:** if `SMTP_HOST` is not set, no email is sent — the code is logged
+to stdout (Railway deploy logs) and shown on the verify page inside a clearly
+labelled "Demo mode" box, so registration still works end-to-end for the viva.
 
 ## Deploying live on Railway (free trial)
 

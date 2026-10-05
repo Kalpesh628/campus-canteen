@@ -15,7 +15,9 @@
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" id="email" value="${email}" required>
+              <input type="email" class="form-control" name="email" id="email" value="${email}" required
+                     placeholder="you@acpce.ac.in">
+              <div class="form-text">Use your college email (@acpce.ac.in) — we'll send a verification code.</div>
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label">Phone</label>
@@ -47,6 +49,7 @@ function vReg(){
   var p2 = document.getElementById('pw2').value;
   if(n.length < 2){ alert('Enter your full name.'); return false; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){ alert('Enter a valid email.'); return false; }
+  if(!/@acpce\.ac\.in$/i.test(e)){ alert('Please use your college email (@acpce.ac.in).'); return false; }
   if(p.length < 6){ alert('Password must be at least 6 characters.'); return false; }
   if(p !== p2){ alert('Passwords do not match.'); return false; }
   return true;

@@ -16,6 +16,7 @@ public class User implements Serializable {
     private String salt;
     private String phone;
     private String role;         // "STUDENT" or "ADMIN"
+    private boolean emailVerified;
     private LocalDateTime createdAt;
 
     public int getId() { return id; }
@@ -38,6 +39,9 @@ public class User implements Serializable {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

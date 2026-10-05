@@ -35,7 +35,8 @@ public class SchemaInitListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try (Connection c = DBUtil.getConnection()) {
             if (tableExists(c, "users")) {
-                LOG.info("SchemaInit: tables already present, skipping.");
+                LOG.info("SchemaInit: tables already present, applying column migrations if needed.");
+                migrateUserColumns(c);
                 return;
             }
             LOG.info("SchemaInit: empty database detected, creating schema...");
@@ -52,6 +53,37 @@ public class SchemaInitListener implements ServletContextListener {
         DatabaseMetaData md = c.getMetaData();
         try (ResultSet rs = md.getTables(c.getCatalog(), null, table, new String[]{"TABLE"})) {
             return rs.next();
+        }
+    }
+
+    /**
+     * Adds email-verification columns to a pre-existing `users` table
+     * (databases created before this feature shipped). MySQL has no
+     * ADD COLUMN IF NOT EXISTS, so a duplicate-column error (1060) is
+     * swallowed and treated as "already migrated".
+     */
+    private void migrateUserColumns(Connection c) {
+        String[] alters = {
+            "ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT FALSE",
+            "ALTER TABLE users ADD COLUMN verify_code CHAR(6)",
+            "ALTER TABLE users ADD COLUMN verify_expires TIMESTAMP NULL",
+            "UPDATE users SET email_verified = TRUE WHERE role = 'ADMIN'"
+        };
+        try (Statement st = c.createStatement()) {
+            for (String sql : alters) {
+                try {
+                    st.execute(sql);
+                    LOG.info("SchemaInit migration applied: " + sql);
+                } catch (java.sql.SQLException e) {
+                    if (e.getErrorCode() == 1060) {
+                        LOG.fine("SchemaInit migration skipped (already applied).");
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.severe("SchemaInit migration failed: " + e.getMessage());
         }
     }
 

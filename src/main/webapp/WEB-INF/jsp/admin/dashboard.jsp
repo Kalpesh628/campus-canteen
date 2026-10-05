@@ -57,7 +57,8 @@
     <div class="mt-3">
       <a class="btn btn-outline-success me-2" href="${pageContext.request.contextPath}/admin/menu">Manage Menu</a>
       <a class="btn btn-outline-success me-2" href="${pageContext.request.contextPath}/admin/slots">Pickup Slots</a>
-      <a class="btn btn-outline-success" href="${pageContext.request.contextPath}/admin/feedback">Feedback</a>
+      <a class="btn btn-outline-success me-2" href="${pageContext.request.contextPath}/admin/feedback">Feedback</a>
+      <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/admin/password">Change Password</a>
     </div>
   </div>
 </div>

@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS users (
   salt          VARCHAR(64)  NOT NULL,
   phone         VARCHAR(20),
   role          ENUM('STUDENT','ADMIN') NOT NULL DEFAULT 'STUDENT',
+  email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  verify_code   CHAR(6),
+  verify_expires TIMESTAMP NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -95,10 +98,10 @@ CREATE TABLE IF NOT EXISTS feedback (
 -- Admin account: admin@canteen.local / admin123
 -- (hash = SHA-256( hex-decoded salt bytes + "admin123" ), exactly as
 --  PasswordUtil.verify() computes it. CHANGE this password after first login.)
-INSERT IGNORE INTO users (name, email, password_hash, salt, phone, role) VALUES
+INSERT IGNORE INTO users (name, email, password_hash, salt, phone, role, email_verified) VALUES
 ('Canteen Admin', 'admin@canteen.local',
  '5764ed82adca085e138c53f05c850cbd16c299ce095959b98778044dd8ea849f',
- 'a2916edd003ffb0d2f2cd5d322f1ca06', '9000000000', 'ADMIN');
+ 'a2916edd003ffb0d2f2cd5d322f1ca06', '9000000000', 'ADMIN', TRUE);
 
 -- Sample menu (run once - no unique key, re-running would duplicate rows)
 INSERT INTO menu_items (name, description, price, category, veg, available) VALUES

@@ -156,3 +156,32 @@ Three honest answers: (1) connection pooling (HikariCP) instead of
 DriverManager; (2) password hashing with bcrypt instead of SHA-256; (3) an
 order-confirmation SMS/email hook and a real payment gateway interface. And the
 admin password must be changed from the seeded default — noted in the README.
+
+## 26. Why did the cart page crash with a 500 error once, and how was it fixed?
+`${it.lineTotal}` in `cart.jsp` is EL property access, which resolves to a
+JavaBeans getter (`getLineTotal()`). `CartItem` only had a plain method
+`lineTotal()`, so EL threw `PropertyNotFoundException` mid-render. Fix: added
+a proper `getLineTotal()` getter delegating to `lineTotal()`. Lesson: in JSP
+EL, `${x.y}` always means `getY()`, never an arbitrary method.
+
+## 27. How is registration restricted to college emails?
+`AuthServlet.COLLEGE_DOMAIN = "acpce.ac.in"`. `validate()` rejects any other
+domain server-side (the JSP also checks in JS first), and `doLogin` re-checks
+for students — the seeded admin account is exempt. Both checks are
+case-insensitive via `toLowerCase()`.
+
+## 28. Walk me through the email verification flow.
+Register → row created with `email_verified = FALSE` → `SecureRandom`
+6-digit code stored with a 15-minute expiry (`verify_code`,
+`verify_expires`) → sent via SMTP (`EmailUtil`, Jakarta Mail) → user lands on
+`/verify`. Correct code (compared with `MessageDigest.isEqual`, timing-safe)
+→ `markEmailVerified()` sets the flag and clears the code → session login →
+`/menu`. Login before verifying redirects back to `/verify`. Without
+`SMTP_HOST` set, the app runs in labelled demo mode: the code is logged and
+shown on the verify page so the flow still works end-to-end.
+
+## 29. What happens to the database when this new version deploys over the old one?
+`SchemaInitListener` now runs a migration when the `users` table already
+exists: `ALTER TABLE ... ADD COLUMN` for `email_verified`, `verify_code`,
+`verify_expires`, swallowing MySQL error 1060 (duplicate column) so re-deploys
+are idempotent. Existing admins are backfilled to verified.
