@@ -1,5 +1,19 @@
 <%@ include file="/WEB-INF/jsp/inc/header.jsp" %>
-<h2 class="mb-3">Today's Menu</h2>
+<section class="hero">
+  <div class="kicker">// today's drop — pre-order now, pick up hot</div>
+  <h1>Skip the line.<br><span class="hl">Grab</span> <span class="stroke">your grub.</span></h1>
+  <p class="sub">Order from your phone between lectures. We fire it up, you walk in, <b>pickup in minutes</b> — and you pay at the counter, like always.</p>
+  <div class="chip-row">
+    <span class="chip"><b>&#9889;</b> zero queue</span>
+    <span class="chip">pay at canteen — <b>no prepaid drama</b></span>
+    <span class="chip tilt"><b>new</b> neon build v2.0</span>
+    <span class="chip">pickup slots <b>live</b></span>
+  </div>
+</section>
+<div class="ticker" aria-hidden="true"><div class="track">
+  <span>fresh &amp; hot</span><b>&#183;</b><span>order ahead</span><b>&#183;</b><span>skip the queue</span><b>&#183;</b><span>pay at counter</span><b>&#183;</b><span>veg + non-veg</span><b>&#183;</b><span>pickup slots live</span><b>&#183;</b><span>fresh &amp; hot</span><b>&#183;</b><span>order ahead</span><b>&#183;</b><span>skip the queue</span><b>&#183;</b><span>pay at counter</span><b>&#183;</b>
+</div></div>
+<h2 class="mb-3 mt-4">Today's Menu</h2>
 
 <form class="row g-2 mb-4" method="get" action="${pageContext.request.contextPath}/menu">
   <div class="col-md-5">
