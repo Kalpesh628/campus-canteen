@@ -21,7 +21,7 @@
               <div class="form-text">Use your college email (@acpce.ac.in).</div>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Phone (10-digit mobile)</label>
+              <label class="form-label">Mobile number (10-digit)</label>
               <input class="form-control" name="phone" id="phone" value="<c:out value='${phone}'/>" required
                      placeholder="9876543210" inputmode="numeric" maxlength="13">
               <div class="form-text">We'll send a verification code to this number.</div>
@@ -29,7 +29,7 @@
           </div>
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Password (min 6 chars)</label>
+              <label class="form-label">Password (minimum 6 characters)</label>
               <input type="password" class="form-control" name="password" id="pw" required>
             </div>
             <div class="col-md-6 mb-3">

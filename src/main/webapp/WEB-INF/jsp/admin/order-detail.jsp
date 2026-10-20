@@ -6,7 +6,7 @@
 </c:if>
 <c:if test="${not empty order.note}"><div class="alert alert-info">Kitchen note: <c:out value="${order.note}"/></div></c:if>
 
-<table class="table">
+<div class="table-responsive"><table class="table">
   <thead><tr><th>Dish</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
   <tbody>
     <c:forEach var="it" items="${order.items}">
@@ -15,7 +15,7 @@
         <td>&#8377;<fmt:formatNumber value="${it.lineTotal}" minFractionDigits="2"/></td></tr>
     </c:forEach>
   </tbody>
-</table>
+</table></div>
 <h5>Total: <span class="text-success">&#8377;<fmt:formatNumber value="${order.total}" minFractionDigits="2"/></span> (Pay at Canteen)</h5>
 
 <c:if test="${not empty nextStatuses}">

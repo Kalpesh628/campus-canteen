@@ -10,7 +10,7 @@
     </select>
   </div>
 </form>
-<table class="table table-striped align-middle">
+<div class="table-responsive"><table class="table table-striped align-middle">
   <thead><tr><th>#</th><th>Student</th><th>Pickup</th><th>Total</th><th>Status</th><th></th></tr></thead>
   <tbody>
     <c:forEach var="o" items="${orders}">
@@ -33,5 +33,5 @@
     </c:forEach>
     <c:if test="${empty orders}"><tr><td colspan="6" class="text-muted">No orders found.</td></tr></c:if>
   </tbody>
-</table>
+</table></div>
 <%@ include file="/WEB-INF/jsp/inc/footer.jsp" %>

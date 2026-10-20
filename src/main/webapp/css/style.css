@@ -1,4 +1,4 @@
-/* Campus Canteen — UI polish round 1 (light theme, brand green kept).
+/* Campus Canteen — UI polish round 2 (light theme, brand green kept). Round 2: QA fixes (font weights, contrast, touch targets, responsive tables/timeline) + hero panel + dish bands.
    Same design language as the original, refined: softer surfaces,
    consistent radius/shadows, better type, calmer focus states. */
 
@@ -6,7 +6,7 @@
   --brand: #198754;
   --brand-dark: #146c43;
   --ink: #1e2a23;
-  --muted: #63736a;
+  --muted: #54655b;
   --line: rgba(25, 135, 84, .12);
   --surface: #ffffff;
   --bg: #f4f8f4;
@@ -20,14 +20,19 @@ body {
   color: var(--ink);
   font-family: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
 }
 
 h1, h2, h3, h4, h5 { letter-spacing: -.015em; font-weight: 700; }
+h1 { font-size: 1.65rem; }
 h2 { font-size: 1.65rem; }
 
 /* Navbar */
 .navbar { box-shadow: 0 2px 14px rgba(15, 60, 35, .18); }
 .navbar-brand { letter-spacing: -.01em; font-size: 1.28rem; }
+.navbar { --bs-navbar-color: rgba(255,255,255,.94); --bs-navbar-hover-color: #fff; --bs-navbar-active-color: #fff; }
+.navbar-dark .nav-link { color: rgba(255,255,255,.94); }
+.brand-badge { background: #fff; border-radius: 10px; padding: .08em .38em; margin-right: .1em; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
 .navbar .nav-link { font-weight: 500; padding-top: .55rem; padding-bottom: .55rem; }
 .navbar .badge { border-radius: 999px; font-weight: 700; }
 
@@ -51,7 +56,9 @@ h2 { font-size: 1.65rem; }
 }
 .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .card-img-top { border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
-.card-title { font-weight: 650; font-size: 1.06rem; }
+.card-title { font-weight: 600; }
+.dish-card .card-title { font-size: 1.06rem; }
+.desc { color: #4c5c52; }
 .cat-badge {
   background: #e8f3ec !important;
   color: var(--brand-dark) !important;
@@ -78,7 +85,7 @@ h2 { font-size: 1.65rem; }
 }
 .btn { border-radius: 10px; font-weight: 600; }
 .btn-success {
-  background: linear-gradient(180deg, #1fa065, var(--brand) 55%, var(--brand-dark));
+  background: linear-gradient(180deg, #1a8f5a, var(--brand) 55%, var(--brand-dark));
   border-color: var(--brand-dark);
   box-shadow: 0 2px 6px rgba(20, 108, 67, .25);
 }
@@ -92,14 +99,14 @@ h2 { font-size: 1.65rem; }
 /* Alerts + tables */
 .alert { border-radius: 12px; }
 .table { vertical-align: middle; }
-.table thead th { background: #eef5f0; color: var(--brand-dark); border-bottom: none; font-weight: 650; }
+.table thead th { background: #eef5f0; color: var(--brand-dark); border-bottom: none; font-weight: 600; }
 
 /* Footer */
 footer { background: #fff; }
 
 /* Order tracking timeline (brand-aligned) */
 .timeline { display:flex; gap:0; margin: 1.5rem 0; }
-.tstep { flex:1; text-align:center; position:relative; font-size:.8rem; color:#999; }
+.tstep { flex:1; text-align:center; position:relative; font-size:.8rem; color:#5f7267; }
 .tstep .dot { width:34px; height:34px; border-radius:50%; background:#dee2e6; color:#fff;
   display:flex; align-items:center; justify-content:center; margin:0 auto 6px; font-weight:bold; }
 .tstep.done { color:#198754; }
@@ -110,7 +117,47 @@ footer { background: #fff; }
 .tstep:first-child::before { display:none; }
 .tstep.done::before { background:#198754; }
 
+.hero-panel {
+  background: linear-gradient(135deg, #e7f4ec 0%, #f4faf5 70%);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.4rem 1.5rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+.hero-panel h1 { margin-bottom: .3rem; }
+.hero-chips { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .8rem; }
+.hero-chips span {
+  background: #fff; border: 1px solid var(--line); color: var(--brand-dark);
+  border-radius: 999px; padding: .28rem .7rem; font-size: .8rem; font-weight: 600;
+}
+.dish-band {
+  height: 104px; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #2aa36b, var(--brand-dark));
+  color: #fff; font-size: 2.3rem; font-weight: 800; letter-spacing: -.02em;
+  border-top-left-radius: var(--radius); border-top-right-radius: var(--radius);
+}
+.card-img-top { height: 180px; object-fit: cover; }
+.qty-input { width: 4.25rem; }
+.foot-brand { font-weight: 700; color: var(--ink); margin-bottom: .15rem; }
+
+@media (hover: none) {
+  .card:hover { transform: none; box-shadow: var(--shadow-sm); }
+}
+@media (pointer: coarse) {
+  .btn-sm { min-height: 44px; }
+  .form-control, .form-select { min-height: 44px; }
+}
+@media (max-width: 767.98px) {
+  .table-responsive { -webkit-overflow-scrolling: touch; }
+}
 @media (max-width: 576px) {
-  h2 { font-size: 1.4rem; }
-  .card:hover { transform: none; }
+  h1, h2 { font-size: 1.4rem; }
+  .hero-panel { padding: 1.1rem 1.1rem .9rem; }
+  .tstep { font-size: .62rem; letter-spacing: -.02em; }
+  .tstep .dot { width: 28px; height: 28px; }
+  .tstep::before { top: 14px; }
+}
+@media (max-width: 414px) {
+  .navbar-brand { font-size: 1.12rem; }
+  .filter-bar { padding: .75rem; }
 }

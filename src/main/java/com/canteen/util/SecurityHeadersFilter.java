@@ -18,8 +18,8 @@ import java.io.IOException;
  *   (clickjacking defence).
  * - Referrer-Policy: strict-origin-when-cross-origin — don't leak full URLs.
  *
- * HSTS is intentionally NOT set here: it's better terminated at the
- * CDN/reverse-proxy (Cloudflare/Railway) which already forces HTTPS.
+ * HSTS is set here (max-age 1 year): the site is HTTPS-only in
+ * production and the edge does not add it for us.
  * Declared via @WebFilter so no web.xml edit is needed.
  */
 @WebFilter("/*")
@@ -33,6 +33,13 @@ public class SecurityHeadersFilter implements Filter {
             h.setHeader("X-Content-Type-Options", "nosniff");
             h.setHeader("X-Frame-Options", "DENY");
             h.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+            h.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            if (req instanceof jakarta.servlet.http.HttpServletRequest) {
+                String uri = ((jakarta.servlet.http.HttpServletRequest) req).getRequestURI();
+                if (uri != null && uri.endsWith(".css")) {
+                    h.setHeader("Cache-Control", "public, max-age=86400");
+                }
+            }
         }
         chain.doFilter(req, resp);
     }

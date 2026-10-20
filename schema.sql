@@ -112,11 +112,11 @@ INSERT INTO menu_items (name, description, price, category, veg, available) VALU
 ('Poha', 'Flattened rice with peanuts, curry leaves & lemon', 30.00, 'Breakfast', TRUE, TRUE),
 ('Veg Thali', 'Roti, rice, dal, 2 sabzi, salad & papad', 90.00, 'Lunch', TRUE, TRUE),
 ('Chicken Biryani', 'Hyderabadi style with mirchi ka salan', 120.00, 'Lunch', FALSE, TRUE),
-('Paneer Butter Masala + Naan', 'Rich paneer curry with 2 butter naans', 110.00, 'Lunch', TRUE, TRUE),
-('Samosa (2 pc)', 'With tamarind & mint chutney', 25.00, 'Snacks', TRUE, TRUE),
+('Paneer Butter Masala & Naan', 'Rich paneer curry with 2 butter naan', 110.00, 'Lunch', TRUE, TRUE),
+('Samosa (2 pieces)', 'Served with tamarind & mint chutney', 25.00, 'Snacks', TRUE, TRUE),
 ('Veg Sandwich', 'Grilled triple-layer with mint mayo', 40.00, 'Snacks', TRUE, TRUE),
 ('Cold Coffee', 'Blended with vanilla ice cream', 60.00, 'Beverages', TRUE, TRUE),
-('Masala Chai', 'Kadak cutting chai', 20.00, 'Beverages', TRUE, TRUE),
+('Masala Chai', 'Strong, spiced masala tea', 20.00, 'Beverages', TRUE, TRUE),
 ('Egg Curry + Rice', 'Homestyle egg curry with steamed rice', 95.00, 'Lunch', FALSE, FALSE);
 
 -- Pickup slots for today + next 2 days (safe to re-run any day: INSERT IGNORE + date-based)

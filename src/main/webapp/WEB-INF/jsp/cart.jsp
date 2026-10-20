@@ -6,7 +6,7 @@
     <div class="alert alert-info">Your cart is empty. <a href="${pageContext.request.contextPath}/menu">Browse the menu</a> to add something tasty.</div>
   </c:when>
   <c:otherwise>
-    <table class="table table-striped align-middle">
+    <div class="table-responsive"><table class="table table-striped align-middle">
       <thead>
         <tr><th>Dish</th><th>Type</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr>
       </thead>
@@ -22,7 +22,7 @@
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="id" value="${it.menuItemId}">
                 <input type="hidden" name="back" value="/cart">
-                <input type="number" name="qty" value="${it.qty}" min="0" max="20" class="form-control form-control-sm" style="width:70px">
+                <input type="number" name="qty" value="${it.qty}" min="0" max="20" class="form-control form-control-sm qty-input">
                 <button class="btn btn-sm btn-outline-primary">Update</button>
               </form>
             </td>
@@ -38,7 +38,7 @@
           </tr>
         </c:forEach>
       </tbody>
-    </table>
+    </table></div>
     <div class="d-flex justify-content-end align-items-center gap-3">
       <h4 class="mb-0">Total: <span class="text-success">&#8377;<fmt:formatNumber value="${cartTotal}" minFractionDigits="2"/></span></h4>
       <a class="btn btn-success btn-lg" href="${pageContext.request.contextPath}/checkout">Checkout &#8594;</a>

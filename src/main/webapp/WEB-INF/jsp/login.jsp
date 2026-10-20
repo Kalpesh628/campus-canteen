@@ -17,7 +17,7 @@
             <label class="form-label">Email</label>
             <input type="email" class="form-control" name="email" id="email" required
                    placeholder="you@acpce.ac.in">
-            <div class="form-text">Students: your college email (@acpce.ac.in).</div>
+            <div class="form-text">Use your college email (@acpce.ac.in).</div>
           </div>
           <div class="mb-3">
             <label class="form-label">Password</label>

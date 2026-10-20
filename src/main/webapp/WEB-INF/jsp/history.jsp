@@ -5,7 +5,7 @@
     <div class="alert alert-info">No orders yet. <a href="${pageContext.request.contextPath}/menu">Order something!</a></div>
   </c:when>
   <c:otherwise>
-    <table class="table table-striped align-middle">
+    <div class="table-responsive"><table class="table table-striped align-middle">
       <thead><tr><th>#</th><th>Pickup</th><th>Total</th><th>Status</th><th></th></tr></thead>
       <tbody>
         <c:forEach var="o" items="${orders}">
@@ -32,7 +32,7 @@
           </tr>
         </c:forEach>
       </tbody>
-    </table>
+    </table></div>
   </c:otherwise>
 </c:choose>
 <%@ include file="/WEB-INF/jsp/inc/footer.jsp" %>

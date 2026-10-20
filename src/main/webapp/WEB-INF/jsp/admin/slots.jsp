@@ -11,7 +11,7 @@
     <div class="col-md-3"><button class="btn btn-success w-100">Add Slot</button></div>
   </form>
 </div></div>
-<table class="table table-striped align-middle">
+<div class="table-responsive"><table class="table table-striped align-middle">
   <thead><tr><th>Date</th><th>Window</th><th>Max</th><th>Booked</th><th>Active</th><th></th></tr></thead>
   <tbody>
     <c:forEach var="s" items="${slots}">
@@ -34,5 +34,5 @@
     </c:forEach>
     <c:if test="${empty slots}"><tr><td colspan="6" class="text-muted">No slots yet. Add the first one above.</td></tr></c:if>
   </tbody>
-</table>
+</table></div>
 <%@ include file="/WEB-INF/jsp/inc/footer.jsp" %>

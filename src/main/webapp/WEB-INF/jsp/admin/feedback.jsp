@@ -5,7 +5,7 @@
     <div class="alert alert-info">No feedback yet.</div>
   </c:when>
   <c:otherwise>
-    <table class="table table-striped">
+    <div class="table-responsive"><table class="table table-striped">
       <thead><tr><th>Order</th><th>Student</th><th>Rating</th><th>Comment</th><th>When</th></tr></thead>
       <tbody>
         <c:forEach var="f" items="${feedbacks}">
@@ -24,7 +24,7 @@
           </tr>
         </c:forEach>
       </tbody>
-    </table>
+    </table></div>
   </c:otherwise>
 </c:choose>
 <%@ include file="/WEB-INF/jsp/inc/footer.jsp" %>

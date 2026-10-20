@@ -16,21 +16,21 @@
   <div class="col-md-6">
     <div class="card shadow-sm mb-4"><div class="card-body">
       <h5>Orders per day (last 7 days)</h5>
-      <table class="table table-sm"><tbody>
+      <div class="table-responsive"><table class="table table-sm"><tbody>
         <c:forEach var="r" items="${ordersPerDay}">
           <tr><td>${r[0]}</td><td><div class="progress"><div class="progress-bar bg-success" style="width:${r[1] * 10}%">${r[1]}</div></div></td></tr>
         </c:forEach>
-      </tbody></table>
+      </tbody></table></div>
     </div></div>
   <div class="col-md-6">
     <div class="card shadow-sm mb-4"><div class="card-body">
       <h5>Top items (all time)</h5>
-      <table class="table table-sm"><tbody>
+      <div class="table-responsive"><table class="table table-sm"><tbody>
         <c:forEach var="t" items="${topItems}">
           <tr><td>${t[0]}</td><td class="text-end"><span class="badge bg-success">${t[1]} sold</span></td></tr>
         </c:forEach>
         <c:if test="${empty topItems}"><tr><td class="text-muted">No sales yet.</td></tr></c:if>
-      </tbody></table>
+      </tbody></table></div>
     </div></div>
 </div>
 
@@ -40,7 +40,7 @@
       <h5 class="mb-0">Recent orders</h5>
       <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/admin/orders">All orders</a>
     </div>
-    <table class="table table-sm">
+    <div class="table-responsive"><table class="table table-sm">
       <thead><tr><th>#</th><th>Student</th><th>Pickup</th><th>Total</th><th>Status</th></tr></thead>
       <tbody>
         <c:forEach var="o" items="${recentOrders}">
@@ -53,7 +53,7 @@
           </tr>
         </c:forEach>
       </tbody>
-    </table>
+    </table></div>
     <div class="mt-3">
       <a class="btn btn-outline-success me-2" href="${pageContext.request.contextPath}/admin/menu">Manage Menu</a>
       <a class="btn btn-outline-success me-2" href="${pageContext.request.contextPath}/admin/slots">Pickup Slots</a>

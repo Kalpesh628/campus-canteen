@@ -1,20 +1,23 @@
 <%@ include file="/WEB-INF/jsp/inc/header.jsp" %>
-<h2 class="mb-1">Today's Menu</h2>
-<p class="page-subtitle mb-3">Fresh from the kitchen — pre-order, skip the queue, pick up at your slot.</p>
+<div class="hero-panel">
+  <h1>Today's Menu</h1>
+  <p class="page-subtitle">Fresh from the kitchen &#8212; pre-order, skip the queue, pick up at your slot.</p>
+  <div class="hero-chips"><span>Pre-order online</span><span>Pay at the canteen</span><span>Pickup slots</span></div>
+</div>
 
 <form class="row g-2 mb-4 filter-bar" method="get" action="${pageContext.request.contextPath}/menu">
   <div class="col-md-5">
-    <input class="form-control" name="q" placeholder="Search dishes..." value="${q}">
+    <input class="form-control" name="q" placeholder="Search dishes..." value="<c:out value='${q}'/>">
   </div>
-  <div class="col-md-3">
+  <div class="col-6 col-md-3">
     <select class="form-select" name="category">
       <option value="">All categories</option>
       <c:forEach var="c" items="${categories}">
-        <option value="${c}" ${c == category ? 'selected' : ''}>${c}</option>
+        <option value="<c:out value='${c}'/>" ${c == category ? 'selected' : ''}><c:out value="${c}"/></option>
       </c:forEach>
     </select>
   </div>
-  <div class="col-md-2">
+  <div class="col-6 col-md-2">
     <select class="form-select" name="veg">
       <option value="all" ${veg == 'all' ? 'selected' : ''}>Veg + Non-veg</option>
       <option value="veg" ${veg == 'veg' ? 'selected' : ''}>Veg only</option>
@@ -32,19 +35,22 @@
 
 <div class="row">
   <c:forEach var="m" items="${items}">
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
+    <div class="col-sm-6 col-lg-4 mb-4">
+      <div class="card dish-card h-100 shadow-sm">
         <c:if test="${not empty m.imageUrl}">
-          <img src="${m.imageUrl}" class="card-img-top" alt="${m.name}" style="height:180px;object-fit:cover;">
+          <img src="<c:out value='${m.imageUrl}'/>" class="card-img-top" alt="<c:out value='${m.name}'/>" loading="lazy" decoding="async">
+        </c:if>
+        <c:if test="${empty m.imageUrl}">
+          <div class="dish-band" aria-hidden="true">${m.name.substring(0,1)}</div>
         </c:if>
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">
             <span class="${m.veg ? 'veg-dot' : 'nonveg-dot'}" title="${m.veg ? 'Veg' : 'Non-veg'}"></span>
-            ${m.name}
+            <c:out value="${m.name}"/>
           </h5>
-          <p class="card-text text-muted small flex-grow-1">${m.description}</p>
+          <p class="card-text desc small flex-grow-1"><c:out value="${m.description}"/></p>
           <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="badge cat-badge">${m.category}</span>
+            <span class="badge cat-badge"><c:out value="${m.category}"/></span>
             <strong class="text-success fs-5">&#8377;<fmt:formatNumber value="${m.price}" minFractionDigits="2"/></strong>
           </div>
           <c:choose>
@@ -55,7 +61,7 @@
               <form method="post" action="${pageContext.request.contextPath}/cart" class="d-flex gap-2">
                 <input type="hidden" name="action" value="add">
                 <input type="hidden" name="id" value="${m.id}">
-                <input type="number" name="qty" value="1" min="1" max="20" class="form-control form-control-sm" style="width:70px">
+                <input type="number" name="qty" value="1" min="1" max="20" class="form-control form-control-sm qty-input">
                 <button class="btn btn-success btn-sm flex-grow-1">Add to Cart</button>
               </form>
             </c:otherwise>

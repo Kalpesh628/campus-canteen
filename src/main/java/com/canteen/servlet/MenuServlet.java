@@ -23,11 +23,12 @@ public class MenuServlet extends HttpServlet {
             String q = req.getParameter("q");
             String category = req.getParameter("category");
             String veg = req.getParameter("veg"); // all | veg | nonveg
+            if (!"veg".equals(veg) && !"nonveg".equals(veg)) veg = "all"; // unknown values fall back to all
             req.setAttribute("items", dao.search(q, category, veg));
             req.setAttribute("categories", dao.distinctCategories());
             req.setAttribute("q", q == null ? "" : q);
             req.setAttribute("category", category == null ? "" : category);
-            req.setAttribute("veg", veg == null ? "all" : veg);
+            req.setAttribute("veg", veg);
             RequestDispatcher rd = req.getRequestDispatcher("/WEB-INF/jsp/menu.jsp");
             rd.forward(req, resp);
         } catch (Exception e) {

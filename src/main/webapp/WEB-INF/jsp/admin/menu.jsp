@@ -29,7 +29,7 @@
   </div>
 </div>
 
-<table class="table table-striped align-middle">
+<div class="table-responsive"><table class="table table-striped align-middle">
   <thead><tr><th>#</th><th>Name</th><th>Category</th><th>Price</th><th>Veg</th><th>Available</th><th></th></tr></thead>
   <tbody>
     <c:forEach var="m" items="${items}">
@@ -53,5 +53,5 @@
       </tr>
     </c:forEach>
   </tbody>
-</table>
+</table></div>
 <%@ include file="/WEB-INF/jsp/inc/footer.jsp" %>

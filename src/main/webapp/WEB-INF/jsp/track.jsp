@@ -21,7 +21,7 @@
           <c:otherwise><c:set var="cls" value=""/></c:otherwise>
         </c:choose>
         <div class="tstep ${cls}">
-          <div class="dot">${vs.index + 1}</div>${st}
+          <div class="dot">${vs.index + 1}</div><c:choose><c:when test="${st == 'PLACED'}">Placed</c:when><c:when test="${st == 'ACCEPTED'}">Accepted</c:when><c:when test="${st == 'PREPARING'}">Preparing</c:when><c:when test="${st == 'READY'}">Ready</c:when><c:when test="${st == 'PICKED_UP'}">Picked up</c:when><c:otherwise>${st}</c:otherwise></c:choose>
         </div>
       </c:forEach>
     </div>
@@ -31,7 +31,7 @@
 <div class="card shadow-sm mb-3">
   <div class="card-body">
     <h5>Items</h5>
-    <table class="table">
+    <div class="table-responsive"><table class="table">
       <thead><tr><th>Dish</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
       <tbody>
         <c:forEach var="it" items="${order.items}">
@@ -42,8 +42,8 @@
           </tr>
         </c:forEach>
       </tbody>
-    </table>
-    <div class="d-flex justify-content-between">
+    </table></div>
+    <div class="d-flex justify-content-between flex-wrap gap-2">
       <span>Payment: <strong>Pay at Canteen</strong></span>
       <h5>Total: <span class="text-success">&#8377;<fmt:formatNumber value="${order.total}" minFractionDigits="2"/></span></h5>
     </div>

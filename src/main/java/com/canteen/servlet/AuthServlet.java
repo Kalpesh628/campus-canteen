@@ -73,7 +73,7 @@ public class AuthServlet extends HttpServlet {
     private void doLogin(HttpServletRequest req, HttpServletResponse resp)
             throws Exception {
         if (!CsrfUtil.valid(req)) {
-            req.setAttribute("error", "Session expired. Please try again.");
+            req.setAttribute("error", "Form expired - please try again.");
             req.setAttribute("csrfToken", CsrfUtil.tokenFor(req.getSession(true)));
             forward(req, resp, "/WEB-INF/jsp/login.jsp");
             return;
@@ -131,7 +131,7 @@ public class AuthServlet extends HttpServlet {
             err = "This phone number is already registered. Try logging in.";
         }
         if (!CsrfUtil.valid(req)) {
-            err = "Session expired. Please try again.";
+            err = "Form expired - please try again.";
         }
         if (err != null) {
             req.setAttribute("error", err);
