@@ -10,6 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <c:set var="sp" value="${pageContext.request.servletPath}"/>
   <c:choose>
+    <c:when test="${sp.contains('admin')}"><c:set var="pageTitle" value="Admin"/></c:when>
     <c:when test="${sp.contains('menu')}"><c:set var="pageTitle" value="Today's Menu"/></c:when>
     <c:when test="${sp.contains('login')}"><c:set var="pageTitle" value="Student Login"/></c:when>
     <c:when test="${sp.contains('register')}"><c:set var="pageTitle" value="Create Student Account"/></c:when>
@@ -18,7 +19,6 @@
     <c:when test="${sp.contains('track')}"><c:set var="pageTitle" value="Track Order"/></c:when>
     <c:when test="${sp.contains('orders')}"><c:set var="pageTitle" value="My Orders"/></c:when>
     <c:when test="${sp.contains('checkout')}"><c:set var="pageTitle" value="Checkout"/></c:when>
-    <c:when test="${sp.contains('admin')}"><c:set var="pageTitle" value="Admin"/></c:when>
     <c:otherwise><c:set var="pageTitle" value=""/></c:otherwise>
   </c:choose>
   <title><c:if test="${not empty pageTitle}">${pageTitle} &#183; </c:if>Campus Canteen</title>
