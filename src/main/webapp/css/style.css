@@ -1,4 +1,4 @@
-/* Campus Canteen — UI polish round 2 (light theme, brand green kept). Round 2: QA fixes (font weights, contrast, touch targets, responsive tables/timeline) + hero panel + dish bands.
+/* Campus Canteen — UI polish round 3 (light theme, brand green kept). Round 2: QA fixes (font weights, contrast, touch targets, responsive tables/timeline) + hero panel + dish bands.
    Same design language as the original, refined: softer surfaces,
    consistent radius/shadows, better type, calmer focus states. */
 
@@ -161,3 +161,39 @@ footer { background: #fff; }
   .navbar-brand { font-size: 1.12rem; }
   .filter-bar { padding: .75rem; }
 }
+
+/* ---- Round 3: visual appeal (rich hero, dish art, price pill, dark footer) ---- */
+.navbar.bg-success { background: linear-gradient(90deg, #125f3b, var(--brand) 60%, #1d9d61) !important; }
+.hero-panel {
+  background:
+    radial-gradient(420px 200px at 85% -40px, rgba(255,255,255,.22), transparent 60%),
+    radial-gradient(rgba(255,255,255,.14) 1.2px, transparent 1.3px),
+    linear-gradient(120deg, #0f5132 0%, var(--brand-dark) 45%, #1d9d61 100%);
+  background-size: auto, 22px 22px, auto;
+  border: none;
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(15, 81, 50, .28);
+}
+.hero-panel h1 { color: #fff; font-size: 2rem; font-weight: 800; }
+.hero-panel .page-subtitle { color: rgba(255,255,255,.86); font-size: 1.02rem; }
+.hero-chips span {
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.38);
+  color: #fff; backdrop-filter: blur(3px);
+}
+.dish-card { overflow: hidden; }
+.dish-band { font-size: 2.6rem; height: 112px; text-shadow: 0 3px 10px rgba(0,0,0,.25); }
+.band-beverages { background: linear-gradient(135deg, #0e7c86, #149a8a); }
+.band-breakfast { background: linear-gradient(135deg, #d97706, #e8a13a); }
+.band-lunch { background: linear-gradient(135deg, #2aa36b, var(--brand-dark)); }
+.band-snacks { background: linear-gradient(135deg, #7c4da0, #9a6bc0); }
+.price-pill {
+  background: #e8f3ec; color: var(--brand-dark); font-weight: 700; font-size: 1.08rem;
+  border-radius: 999px; padding: .22rem .7rem;
+}
+footer {
+  background: linear-gradient(180deg, #146c43, #0f5132);
+  border-top: none !important;
+}
+footer .foot-brand { color: #fff; font-size: 1.05rem; }
+footer small, footer .text-muted { color: rgba(255,255,255,.78) !important; }
+@media (max-width: 576px) { .hero-panel h1 { font-size: 1.55rem; } }

@@ -41,7 +41,14 @@
           <img src="<c:out value='${m.imageUrl}'/>" class="card-img-top" alt="<c:out value='${m.name}'/>" loading="lazy" decoding="async">
         </c:if>
         <c:if test="${empty m.imageUrl}">
-          <div class="dish-band" aria-hidden="true">${m.name.substring(0,1)}</div>
+          <c:choose>
+            <c:when test="${m.category == 'Beverages'}"><c:set var="bandCls" value="band-beverages"/></c:when>
+            <c:when test="${m.category == 'Breakfast'}"><c:set var="bandCls" value="band-breakfast"/></c:when>
+            <c:when test="${m.category == 'Lunch'}"><c:set var="bandCls" value="band-lunch"/></c:when>
+            <c:when test="${m.category == 'Snacks'}"><c:set var="bandCls" value="band-snacks"/></c:when>
+            <c:otherwise><c:set var="bandCls" value=""/></c:otherwise>
+          </c:choose>
+          <div class="dish-band ${bandCls}" aria-hidden="true"><c:choose><c:when test="${m.name.contains('Coffee')}">&#9749;</c:when><c:when test="${m.name.contains('Chai')}">&#127861;</c:when><c:when test="${m.name.contains('Dosa')}">&#129374;</c:when><c:when test="${m.name.contains('Poha')}">&#127834;</c:when><c:when test="${m.name.contains('Biryani')}">&#127831;</c:when><c:when test="${m.name.contains('Paneer')}">&#127835;</c:when><c:when test="${m.name.contains('Thali')}">&#127869;</c:when><c:when test="${m.name.contains('Samosa')}">&#129375;</c:when><c:when test="${m.name.contains('Sandwich')}">&#129386;</c:when><c:otherwise>&#127860;</c:otherwise></c:choose></div>
         </c:if>
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">
@@ -51,7 +58,7 @@
           <p class="card-text desc small flex-grow-1"><c:out value="${m.description}"/></p>
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="badge cat-badge"><c:out value="${m.category}"/></span>
-            <strong class="text-success fs-5">&#8377;<fmt:formatNumber value="${m.price}" minFractionDigits="2"/></strong>
+            <span class="price-pill">&#8377;<fmt:formatNumber value="${m.price}" minFractionDigits="2"/></span>
           </div>
           <c:choose>
             <c:when test="${empty sessionScope.user}">
