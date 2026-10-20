@@ -1,7 +1,8 @@
 <%@ include file="/WEB-INF/jsp/inc/header.jsp" %>
-<h2 class="mb-3">Today's Menu</h2>
+<h2 class="mb-1">Today's Menu</h2>
+<p class="page-subtitle mb-3">Fresh from the kitchen — pre-order, skip the queue, pick up at your slot.</p>
 
-<form class="row g-2 mb-4" method="get" action="${pageContext.request.contextPath}/menu">
+<form class="row g-2 mb-4 filter-bar" method="get" action="${pageContext.request.contextPath}/menu">
   <div class="col-md-5">
     <input class="form-control" name="q" placeholder="Search dishes..." value="${q}">
   </div>
@@ -43,7 +44,7 @@
           </h5>
           <p class="card-text text-muted small flex-grow-1">${m.description}</p>
           <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="badge bg-secondary">${m.category}</span>
+            <span class="badge cat-badge">${m.category}</span>
             <strong class="text-success fs-5">&#8377;<fmt:formatNumber value="${m.price}" minFractionDigits="2"/></strong>
           </div>
           <c:choose>
